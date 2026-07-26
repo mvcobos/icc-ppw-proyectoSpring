@@ -1,0 +1,35 @@
+server:
+  port: ${PORT:8080}
+  servlet:
+    context-path: /api
+
+spring:
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/academic_events_db}
+    username: ${DB_USERNAME:ups}
+    password: ${DB_PASSWORD:ups123}
+
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+
+  jpa:
+    show-sql: ${JPA_SHOW_SQL:true}
+
+logging:
+  level:
+    root: INFO
+    ec.edu.ups.icc.proyecto: DEBUG
+    org.hibernate.SQL: DEBUG
+
+jwt:
+  secret: ${JWT_SECRET:devSecretKeyForJWT2026MustBeAtLeast256BitsLongForHS256Algorithm}
+  access-expiration: ${JWT_ACCESS_EXPIRATION:900000}
+  refresh-expiration: ${JWT_REFRESH_EXPIRATION:604800000}
+  issuer: proyecto-api
+  header: Authorization
+  prefix: "Bearer "
+
+cors:
+  allowed-origins: ${ALLOWED_ORIGINS:http://localhost:5173,http://localhost:3000}
