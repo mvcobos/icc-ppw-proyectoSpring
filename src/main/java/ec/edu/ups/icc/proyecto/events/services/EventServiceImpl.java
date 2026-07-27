@@ -11,7 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
+import ec.edu.ups.icc.proyecto.security.utils.SecurityUtils;
 import ec.edu.ups.icc.proyecto.registrations.entities.RegistrationStatus;
 import ec.edu.ups.icc.proyecto.registrations.repositories.RegistrationRepository;
 import ec.edu.ups.icc.proyecto.categories.entities.CategoryEntity;
@@ -224,13 +224,16 @@ public class EventServiceImpl implements EventService {
 
     /*
      * Valida la propiedad del recurso
-     *
-     * TODO E2: incorporar el bypass de ADMIN leyendo los roles
-     * del usuario autenticado.
+     * Un ADMIN puede operar sobre cualquier evento (bypass);
+     * un ORGANIZER solo sobre los suyos.
      */
     private void validateOwnership(EventEntity event, Long currentUserId) {
         if (currentUserId == null) {
             throw new AccessDeniedException("Usuario no autenticado");
+        }
+
+        if (SecurityUtils.isCurrentUserAdmin()) {
+            return;
         }
 
         if (event.getOrganizer() == null || event.getOrganizer().getId() == null) {

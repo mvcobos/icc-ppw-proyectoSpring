@@ -7,7 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
+import ec.edu.ups.icc.proyecto.security.utils.SecurityUtils;
 import ec.edu.ups.icc.proyecto.core.dto.PaginationDto;
 import ec.edu.ups.icc.proyecto.core.exceptions.domain.BadRequestException;
 import ec.edu.ups.icc.proyecto.core.exceptions.domain.ConflictException;
@@ -140,12 +140,16 @@ public class SessionServiceImpl implements SessionService {
 
     /*
      * La propiedad de la sesión se hereda del evento (Punto 3).
-     *
-     * TODO E2: incorporar el bypass de ADMIN.
+     * Un ADMIN puede operar sobre cualquier sesión (bypass);
+     * un ORGANIZER solo sobre las de sus propios eventos.
      */
     private void validateOwnership(EventEntity event, Long currentUserId) {
         if (currentUserId == null) {
             throw new AccessDeniedException("Usuario no autenticado");
+        }
+
+        if (SecurityUtils.isCurrentUserAdmin()) {
+            return;
         }
 
         if (event.getOrganizer() == null || event.getOrganizer().getId() == null) {
