@@ -1,6 +1,7 @@
 package ec.edu.ups.icc.proyecto.registrations.controllers;
 
 import org.springframework.data.domain.Page;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -40,7 +41,7 @@ public class RegistrationsController {
     }
 
     // GET /registrations/me
-    // TODO E2: @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("isAuthenticated()")
     @Operation(
         summary = "Listar mis inscripciones",
         description = "Devuelve las inscripciones del participante autenticado."
@@ -53,7 +54,7 @@ public class RegistrationsController {
     }
 
     // GET /registrations/{id}
-    // TODO E2: @PreAuthorize("isAuthenticated()") + propiedad
+    @PreAuthorize("isAuthenticated()")
     @Operation(
         summary = "Buscar inscripción por ID",
         description = "Accesible para el participante dueño o el organizador del evento."
@@ -76,7 +77,7 @@ public class RegistrationsController {
 
     // PATCH /registrations/{id}/status
     // Confirmar descuenta un cupo dentro de la transacción.
-    // TODO E2: @PreAuthorize("hasAnyRole('ORGANIZER','ADMIN')") + propiedad
+    @PreAuthorize("hasAnyRole('ORGANIZER','ADMIN')")
     @Operation(
         summary = "Confirmar o rechazar inscripción",
         description = "Acción del organizador. Confirmar descuenta un cupo del evento."
@@ -105,7 +106,7 @@ public class RegistrationsController {
 
     // PATCH /registrations/{id}/cancel
     // Si la inscripción estaba confirmada, el cupo se libera.
-    // TODO E2: @PreAuthorize("hasRole('PARTICIPANT')") + propiedad
+    @PreAuthorize("hasRole('PARTICIPANT')")
     @Operation(
         summary = "Cancelar mi inscripción",
         description = "Acción del participante. Libera el cupo si la inscripción estaba confirmada."

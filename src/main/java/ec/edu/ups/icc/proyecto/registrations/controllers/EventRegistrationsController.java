@@ -2,6 +2,7 @@ package ec.edu.ups.icc.proyecto.registrations.controllers;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -40,7 +41,7 @@ public class EventRegistrationsController {
     /*
      * POST /events/{eventId}/registrations: El participante sale del usuario autenticado, no del body.
      */
-    // TODO E2: @PreAuthorize("hasRole('PARTICIPANT')")
+    @PreAuthorize("hasRole('PARTICIPANT')")
     @Operation(
         summary = "Inscribirse en un evento",
         description = "Crea una inscripción PENDING para el participante autenticado."
@@ -63,7 +64,7 @@ public class EventRegistrationsController {
     }
 
     // GET /events/{eventId}/registrations?status=CONFIRMED
-    // TODO E2: @PreAuthorize("hasAnyRole('ORGANIZER','ADMIN')") + propiedad
+    @PreAuthorize("hasAnyRole('ORGANIZER','ADMIN')")
     @Operation(
         summary = "Listar inscritos de un evento",
         description = "Devuelve una página de inscripciones. Solo para el organizador del evento."

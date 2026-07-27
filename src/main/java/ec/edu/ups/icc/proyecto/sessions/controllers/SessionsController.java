@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-
+import org.springframework.security.access.prepost.PreAuthorize;
 import ec.edu.ups.icc.proyecto.core.dto.PaginationDto;
 import ec.edu.ups.icc.proyecto.security.services.UserDetailsImpl;
 import ec.edu.ups.icc.proyecto.sessions.dtos.CreateSessionDto;
@@ -95,7 +95,7 @@ public class SessionsController {
     /*
      * POST /events/{eventId}/sessions
      */
-    // TODO E2: @PreAuthorize("hasAnyRole('ORGANIZER','ADMIN')") + propiedad
+    @PreAuthorize("hasAnyRole('ORGANIZER','ADMIN')")
     @Operation(
         summary = "Crear sesión",
         description = "Agrega una sesión al evento. Su horario debe caber dentro del evento."
@@ -126,7 +126,7 @@ public class SessionsController {
     /*
      * PUT /events/{eventId}/sessions/{sessionId}
      */
-    // TODO E2: @PreAuthorize("hasAnyRole('ORGANIZER','ADMIN')") + propiedad
+    @PreAuthorize("hasAnyRole('ORGANIZER','ADMIN')")
     @Operation(
         summary = "Actualizar sesión",
         description = "Actualiza completamente una sesión del evento."
@@ -155,7 +155,7 @@ public class SessionsController {
      * DELETE /events/{eventId}/sessions/{sessionId}
      * Borrado físico: la tabla no tiene eliminación lógica.
      */
-    // TODO E2: @PreAuthorize("hasAnyRole('ORGANIZER','ADMIN')") + propiedad
+    @PreAuthorize("hasAnyRole('ORGANIZER','ADMIN')")
     @Operation(
         summary = "Eliminar sesión",
         description = "Elimina una sesión del evento."

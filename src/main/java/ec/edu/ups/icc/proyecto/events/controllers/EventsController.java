@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-
+import org.springframework.security.access.prepost.PreAuthorize;
 import ec.edu.ups.icc.proyecto.core.dto.PaginationDto;
 import ec.edu.ups.icc.proyecto.events.dtos.ChangeEventStatusDto;
 import ec.edu.ups.icc.proyecto.events.dtos.CreateEventDto;
@@ -81,7 +81,7 @@ public class EventsController {
     }
 
     // POST /events
-    // TODO E2: @PreAuthorize("hasAnyRole('ORGANIZER','ADMIN')")
+    @PreAuthorize("hasAnyRole('ORGANIZER','ADMIN')")
     @Operation(
         summary = "Crear nuevo evento",
         description = "Crea un evento en estado DRAFT a nombre del organizador autenticado."
@@ -104,7 +104,7 @@ public class EventsController {
     }
 
     // PUT /events/{id}
-    // TODO E2: @PreAuthorize("hasAnyRole('ORGANIZER','ADMIN')") + propiedad
+    @PreAuthorize("hasAnyRole('ORGANIZER','ADMIN')")
     @Operation(
         summary = "Actualizar evento",
         description = "Actualiza completamente un evento. Solo su organizador puede hacerlo."
@@ -132,7 +132,7 @@ public class EventsController {
     }
 
     // PATCH /events/{id}/status
-    // TODO E2: @PreAuthorize("hasAnyRole('ORGANIZER','ADMIN')") + propiedad
+    @PreAuthorize("hasAnyRole('ORGANIZER','ADMIN')")
     @Operation(
         summary = "Cambiar estado del evento",
         description = "Aplica una transición de estado: DRAFT, PUBLISHED, FINISHED o CANCELLED."
@@ -157,7 +157,7 @@ public class EventsController {
     }
 
     // DELETE /events/{id}: Eliminación lógica: deleted = true.
-    // TODO E2: @PreAuthorize("hasAnyRole('ORGANIZER','ADMIN')") + propiedad
+    @PreAuthorize("hasAnyRole('ORGANIZER','ADMIN')")
     @Operation(
         summary = "Eliminar evento",
         description = "Elimina lógicamente un evento sin inscripciones confirmadas."

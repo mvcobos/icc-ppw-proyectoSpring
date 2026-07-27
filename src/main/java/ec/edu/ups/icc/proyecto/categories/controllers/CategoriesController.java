@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -91,7 +92,7 @@ public class CategoriesController {
     /*
      * POST /categories
      */
-    // TODO E2: @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(
         summary = "Crear nueva categoría",
         description = "Crea una categoría. El nombre no puede estar repetido."
@@ -116,7 +117,7 @@ public class CategoriesController {
     /*
      * PUT /categories/{id}
      */
-    // TODO E2: @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(
         summary = "Actualizar categoría",
         description = "Actualiza completamente una categoría existente."
@@ -145,7 +146,7 @@ public class CategoriesController {
      *
      * Eliminación lógica: active = false.
      */
-    // TODO E2: @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(
         summary = "Eliminar categoría",
         description = "Elimina lógicamente una categoría según su ID."
