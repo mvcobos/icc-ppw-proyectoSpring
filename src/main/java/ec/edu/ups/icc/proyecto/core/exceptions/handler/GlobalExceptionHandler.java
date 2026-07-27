@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.security.core.AuthenticationException;
@@ -12,6 +13,8 @@ import org.springframework.validation.BindException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import ec.edu.ups.icc.proyecto.core.exceptions.base.ApplicationException;
 import ec.edu.ups.icc.proyecto.core.exceptions.response.ErrorResponse;
@@ -93,6 +96,51 @@ public class GlobalExceptionHandler {
                 .body(response);
     }
 
+     /*
+     * El cuerpo JSON no se puede convertir al DTO.
+     *
+     * Caso típico: un enum con un valor que no existe.
+     * Es un error del cliente, así que responde 400 y no 500.
+     */
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ErrorResponse> handleNotReadableException(
+            HttpMessageNotReadableException ex,
+            HttpServletRequest request) {
+        ErrorResponse response = new ErrorResponse(
+                HttpStatus.BAD_REQUEST,
+                "MALFORMED_REQUEST",
+                "El cuerpo de la petición no es válido o contiene valores no permitidos",
+                request.getRequestURI());
+
+        return ResponseEntity
+                .badRequest()
+                .body(response);
+    }
+
+    /*
+     * Un parámetro de la URL no se puede convertir al tipo esperado.
+     *
+     * Caso típico: ?status=INVENTADO o un id que no es numérico.
+     */
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<ErrorResponse> handleTypeMismatchException(
+            MethodArgumentTypeMismatchException ex,
+            HttpServletRequest request) {
+        Map<String, String> errors = new HashMap<>();
+        errors.put(ex.getName(), "Valor no permitido para este parámetro");
+
+        ErrorResponse response = new ErrorResponse(
+                HttpStatus.BAD_REQUEST,
+                "INVALID_PARAMETER",
+                "Parámetro inválido: " + ex.getName(),
+                request.getRequestURI(),
+                errors);
+
+        return ResponseEntity
+                .badRequest()
+                .body(response);
+    }
+    
     // ============== EXCEPCIONES DE SEGURIDAD ==============
 
     /*

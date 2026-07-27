@@ -1,6 +1,7 @@
 package ec.edu.ups.icc.proyecto.events.services;
 
 import java.util.Set;
+import java.util.List;
 
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
@@ -11,6 +12,8 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import ec.edu.ups.icc.proyecto.registrations.entities.RegistrationStatus;
+import ec.edu.ups.icc.proyecto.registrations.repositories.RegistrationRepository;
 import ec.edu.ups.icc.proyecto.categories.entities.CategoryEntity;
 import ec.edu.ups.icc.proyecto.categories.repositories.CategoryRepository;
 import ec.edu.ups.icc.proyecto.core.dto.PaginationDto;
@@ -31,6 +34,7 @@ import ec.edu.ups.icc.proyecto.events.repositories.EventRepository;
 import ec.edu.ups.icc.proyecto.users.entities.UserEntity;
 import ec.edu.ups.icc.proyecto.users.entities.UserStatus;
 import ec.edu.ups.icc.proyecto.users.repositories.UserRepository;
+
 
 @Service
 public class EventServiceImpl implements EventService {
@@ -54,13 +58,16 @@ public class EventServiceImpl implements EventService {
     private final EventRepository eventRepository;
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
+    private final RegistrationRepository registrationRepository;
     private final EventMapper eventMapper;
 
     public EventServiceImpl(EventRepository eventRepository, UserRepository userRepository,
-            CategoryRepository categoryRepository, EventMapper eventMapper) {
+            CategoryRepository categoryRepository, RegistrationRepository registrationRepository,
+            EventMapper eventMapper) {
         this.eventRepository = eventRepository;
         this.userRepository = userRepository;
         this.categoryRepository = categoryRepository;
+        this.registrationRepository = registrationRepository;
         this.eventMapper = eventMapper;
     }
 
@@ -174,11 +181,15 @@ public class EventServiceImpl implements EventService {
         validateOwnership(entity, currentUserId);
 
         /*
-         * TODO: reemplazar por el conteo real de inscripciones
-         * cuando exista RegistrationRepository.
-         *
-         * Si hay cupos consumidos, existen inscripciones confirmadas.
+         * No se elimina un evento publicado con inscripciones (Punto 9).
+         * Se consideran activas las pendientes y las confirmadas.
          */
+        boolean hasRegistrations = registrationRepository.existsByEventIdAndStatusIn(
+                id, List.of(RegistrationStatus.PENDING, RegistrationStatus.CONFIRMED));
+
+        if (entity.getStatus() == EventStatus.PUBLISHED && hasRegistrations) {
+            throw new ConflictException("No se puede eliminar un evento publicado con inscripciones");
+        }
         if (entity.getStatus() == EventStatus.PUBLISHED
                 && entity.getAvailableCapacity() < entity.getCapacity()) {
             throw new ConflictException("No se puede eliminar un evento publicado con inscripciones");

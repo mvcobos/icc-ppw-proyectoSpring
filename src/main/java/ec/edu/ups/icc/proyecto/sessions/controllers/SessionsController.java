@@ -156,7 +156,6 @@ public class SessionsController {
 
     /*
      * DELETE /events/{eventId}/sessions/{sessionId}
-     *
      * Borrado físico: la tabla no tiene eliminación lógica.
      */
     // TODO E2: @PreAuthorize("hasAnyRole('ORGANIZER','ADMIN')") + propiedad

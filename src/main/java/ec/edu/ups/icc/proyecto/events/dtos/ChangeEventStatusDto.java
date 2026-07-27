@@ -3,9 +3,6 @@ package ec.edu.ups.icc.proyecto.events.dtos;
 import ec.edu.ups.icc.proyecto.events.entities.EventStatus;
 import jakarta.validation.constraints.NotNull;
 
-/**
- * DTO utilizado para cambiar el estado de un evento (PATCH).
- */
 public class ChangeEventStatusDto {
 
     @NotNull(message = "El estado es obligatorio")
