@@ -5,6 +5,7 @@ import jakarta.validation.constraints.Min;
 
 public class PaginationDto {
 
+    // valores default por si no se mandan en el endpoint
     @Min(value = 0, message = "La página debe ser mayor o igual a 0")
     private int page = 0;
 
