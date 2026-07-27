@@ -1,6 +1,7 @@
 package ec.edu.ups.icc.proyecto.registrations.controllers;
 
 import org.springframework.data.domain.Page;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -13,6 +14,7 @@ import ec.edu.ups.icc.proyecto.core.dto.PaginationDto;
 import ec.edu.ups.icc.proyecto.registrations.dtos.ChangeRegistrationStatusDto;
 import ec.edu.ups.icc.proyecto.registrations.dtos.RegistrationResponseDto;
 import ec.edu.ups.icc.proyecto.registrations.services.RegistrationService;
+import ec.edu.ups.icc.proyecto.security.services.UserDetailsImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -31,10 +33,6 @@ import jakarta.validation.Valid;
 @RequestMapping("/registrations")
 public class RegistrationsController {
 
-    // TODO E2: reemplazar por @AuthenticationPrincipal.
-    private static final Long TEMP_PARTICIPANT_ID = 5L;
-    private static final Long TEMP_ORGANIZER_ID = 2L;
-
     private final RegistrationService registrationService;
 
     public RegistrationsController(RegistrationService registrationService) {
@@ -49,9 +47,9 @@ public class RegistrationsController {
     )
     @GetMapping("/me")
     public Page<RegistrationResponseDto> findMine(
-            @Valid @ModelAttribute PaginationDto pagination
+            @Valid @ModelAttribute PaginationDto pagination, @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
-        return registrationService.findMine(TEMP_PARTICIPANT_ID, pagination);
+        return registrationService.findMine(userDetails.getId(), pagination);
     }
 
     // GET /registrations/{id}
@@ -72,8 +70,8 @@ public class RegistrationsController {
             description = "Inscripción no encontrada")
     })
     @GetMapping("/{id}")
-    public RegistrationResponseDto findOne(@PathVariable("id") Long id) {
-        return registrationService.findOne(id, TEMP_PARTICIPANT_ID);
+    public RegistrationResponseDto findOne(@PathVariable("id") Long id, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return registrationService.findOne(id, userDetails.getId());
     }
 
     // PATCH /registrations/{id}/status
@@ -100,9 +98,9 @@ public class RegistrationsController {
     @PatchMapping("/{id}/status")
     public RegistrationResponseDto changeStatus(
             @PathVariable("id") Long id,
-            @Valid @RequestBody ChangeRegistrationStatusDto dto
+            @Valid @RequestBody ChangeRegistrationStatusDto dto, @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
-        return registrationService.changeStatus(id, dto, TEMP_ORGANIZER_ID);
+        return registrationService.changeStatus(id, dto, userDetails.getId());
     }
 
     // PATCH /registrations/{id}/cancel
@@ -124,7 +122,7 @@ public class RegistrationsController {
             description = "La inscripción no admite cancelación")
     })
     @PatchMapping("/{id}/cancel")
-    public RegistrationResponseDto cancel(@PathVariable("id") Long id) {
-        return registrationService.cancel(id, TEMP_PARTICIPANT_ID);
+    public RegistrationResponseDto cancel(@PathVariable("id") Long id, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return registrationService.cancel(id, userDetails.getId());
     }
 }

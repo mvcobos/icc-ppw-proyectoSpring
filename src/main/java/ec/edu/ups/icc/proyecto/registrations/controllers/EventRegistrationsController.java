@@ -2,6 +2,7 @@ package ec.edu.ups.icc.proyecto.registrations.controllers;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,6 +16,7 @@ import ec.edu.ups.icc.proyecto.core.dto.PaginationDto;
 import ec.edu.ups.icc.proyecto.registrations.dtos.RegistrationResponseDto;
 import ec.edu.ups.icc.proyecto.registrations.entities.RegistrationStatus;
 import ec.edu.ups.icc.proyecto.registrations.services.RegistrationService;
+import ec.edu.ups.icc.proyecto.security.services.UserDetailsImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -28,10 +30,6 @@ import jakarta.validation.Valid;
 @RestController
 @RequestMapping("/events/{eventId}/registrations")
 public class EventRegistrationsController {
-
-    // TODO E2: reemplazar por @AuthenticationPrincipal.
-    private static final Long TEMP_PARTICIPANT_ID = 5L;
-    private static final Long TEMP_ORGANIZER_ID = 2L;
 
     private final RegistrationService registrationService;
 
@@ -60,8 +58,8 @@ public class EventRegistrationsController {
     })
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public RegistrationResponseDto create(@PathVariable("eventId") Long eventId) {
-        return registrationService.create(eventId, TEMP_PARTICIPANT_ID);
+    public RegistrationResponseDto create(@PathVariable("eventId") Long eventId, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return registrationService.create(eventId, userDetails.getId());
     }
 
     // GET /events/{eventId}/registrations?status=CONFIRMED
@@ -85,8 +83,8 @@ public class EventRegistrationsController {
     public Page<RegistrationResponseDto> findByEvent(
             @PathVariable("eventId") Long eventId,
             @RequestParam(value = "status", required = false) RegistrationStatus status,
-            @Valid @ModelAttribute PaginationDto pagination
+            @Valid @ModelAttribute PaginationDto pagination, @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
-        return registrationService.findByEvent(eventId, status, pagination, TEMP_ORGANIZER_ID);
+        return registrationService.findByEvent(eventId, status, pagination, userDetails.getId());
     }
 }

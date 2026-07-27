@@ -2,6 +2,7 @@ package ec.edu.ups.icc.proyecto.events.controllers;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -21,6 +22,7 @@ import ec.edu.ups.icc.proyecto.events.dtos.EventFilterDto;
 import ec.edu.ups.icc.proyecto.events.dtos.EventResponseDto;
 import ec.edu.ups.icc.proyecto.events.dtos.UpdateEventDto;
 import ec.edu.ups.icc.proyecto.events.services.EventService;
+import ec.edu.ups.icc.proyecto.security.services.UserDetailsImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -34,14 +36,6 @@ import jakarta.validation.Valid;
 @RestController
 @RequestMapping("/events")
 public class EventsController {
-
-    /*
-     * TODO E2: reemplazar por @AuthenticationPrincipal.
-     *
-     * Mientras no exista autenticación, se usa el organizador
-     * de prueba insertado por la migración V1.
-     */
-    private static final Long TEMP_CURRENT_USER_ID = 2L;
 
     private final EventService eventService;
 
@@ -105,8 +99,8 @@ public class EventsController {
     })
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public EventResponseDto create(@Valid @RequestBody CreateEventDto dto) {
-        return eventService.create(dto, TEMP_CURRENT_USER_ID);
+    public EventResponseDto create(@Valid @RequestBody CreateEventDto dto, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return eventService.create(dto, userDetails.getId());
     }
 
     // PUT /events/{id}
@@ -132,9 +126,9 @@ public class EventsController {
     @PutMapping("/{id}")
     public EventResponseDto update(
             @PathVariable("id") Long id,
-            @Valid @RequestBody UpdateEventDto dto
+            @Valid @RequestBody UpdateEventDto dto, @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
-        return eventService.update(id, dto, TEMP_CURRENT_USER_ID);
+        return eventService.update(id, dto, userDetails.getId());
     }
 
     // PATCH /events/{id}/status
@@ -157,9 +151,9 @@ public class EventsController {
     @PatchMapping("/{id}/status")
     public EventResponseDto changeStatus(
             @PathVariable("id") Long id,
-            @Valid @RequestBody ChangeEventStatusDto dto
+            @Valid @RequestBody ChangeEventStatusDto dto, @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
-        return eventService.changeStatus(id, dto, TEMP_CURRENT_USER_ID);
+        return eventService.changeStatus(id, dto, userDetails.getId());
     }
 
     // DELETE /events/{id}: Eliminación lógica: deleted = true.
@@ -181,7 +175,7 @@ public class EventsController {
     })
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable("id") Long id) {
-        eventService.delete(id, TEMP_CURRENT_USER_ID);
+    public void delete(@PathVariable("id") Long id, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        eventService.delete(id, userDetails.getId());
     }
 }

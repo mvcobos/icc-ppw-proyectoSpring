@@ -2,6 +2,7 @@ package ec.edu.ups.icc.proyecto.sessions.controllers;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import ec.edu.ups.icc.proyecto.core.dto.PaginationDto;
+import ec.edu.ups.icc.proyecto.security.services.UserDetailsImpl;
 import ec.edu.ups.icc.proyecto.sessions.dtos.CreateSessionDto;
 import ec.edu.ups.icc.proyecto.sessions.dtos.SessionResponseDto;
 import ec.edu.ups.icc.proyecto.sessions.dtos.UpdateSessionDto;
@@ -37,11 +39,6 @@ import jakarta.validation.Valid;
 @RestController
 @RequestMapping("/events/{eventId}/sessions")
 public class SessionsController {
-
-    /*
-     * TODO E2: reemplazar por @AuthenticationPrincipal.
-     */
-    private static final Long TEMP_CURRENT_USER_ID = 2L;
 
     private final SessionService sessionService;
 
@@ -121,9 +118,9 @@ public class SessionsController {
     @ResponseStatus(HttpStatus.CREATED)
     public SessionResponseDto create(
             @PathVariable("eventId") Long eventId,
-            @Valid @RequestBody CreateSessionDto dto
+            @Valid @RequestBody CreateSessionDto dto, @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
-        return sessionService.create(eventId, dto, TEMP_CURRENT_USER_ID);
+        return sessionService.create(eventId, dto, userDetails.getId());
     }
 
     /*
@@ -149,9 +146,9 @@ public class SessionsController {
     public SessionResponseDto update(
             @PathVariable("eventId") Long eventId,
             @PathVariable("sessionId") Long sessionId,
-            @Valid @RequestBody UpdateSessionDto dto
+            @Valid @RequestBody UpdateSessionDto dto,  @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
-        return sessionService.update(eventId, sessionId, dto, TEMP_CURRENT_USER_ID);
+        return sessionService.update(eventId, sessionId, dto, userDetails.getId());
     }
 
     /*
@@ -178,8 +175,8 @@ public class SessionsController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(
             @PathVariable("eventId") Long eventId,
-            @PathVariable("sessionId") Long sessionId
+            @PathVariable("sessionId") Long sessionId, @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
-        sessionService.delete(eventId, sessionId, TEMP_CURRENT_USER_ID);
+        sessionService.delete(eventId, sessionId, userDetails.getId());
     }
 }
