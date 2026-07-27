@@ -5,7 +5,7 @@ import org.springframework.http.HttpStatus;
 public class ApplicationException extends RuntimeException {
 
     private final HttpStatus status;
-    private final String code; // Código interno exigido por el Punto 10
+    private final String code; 
 
     protected ApplicationException(HttpStatus status, String code, String message) {
         super(message);

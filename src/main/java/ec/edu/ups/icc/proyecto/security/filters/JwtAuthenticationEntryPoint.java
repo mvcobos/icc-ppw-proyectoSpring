@@ -30,14 +30,26 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
     @Override
     public void commence(HttpServletRequest request,
-                         HttpServletResponse response,
-                         AuthenticationException authException)
+            HttpServletResponse response,
+            AuthenticationException authException)
             throws IOException {
+
+        String code = (String) request.getAttribute("tokenErrorCode");
+        String message;
+
+        if (code == null) {
+            code = "UNAUTHORIZED";
+            message = "Debe autenticarse para acceder a este recurso.";
+        } else if (code.equals("TOKEN_EXPIRED")) {
+            message = "El token ha expirado. Use el refresh token para renovarlo.";
+        } else {
+            message = "El token proporcionado no es valido.";
+        }
 
         ErrorResponse error = new ErrorResponse(
                 HttpStatus.UNAUTHORIZED,
-                "UNAUTHORIZED",
-                "Debe autenticarse para acceder a este recurso.",
+                code,
+                message,
                 request.getRequestURI());
 
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);

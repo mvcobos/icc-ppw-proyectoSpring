@@ -13,18 +13,15 @@ import org.springframework.validation.BindException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import ec.edu.ups.icc.proyecto.core.exceptions.base.ApplicationException;
+import ec.edu.ups.icc.proyecto.core.exceptions.domain.TooManyRequestsException;
 import ec.edu.ups.icc.proyecto.core.exceptions.response.ErrorResponse;
 import jakarta.servlet.http.HttpServletRequest;
 
 /*
- * Manejo centralizado de excepciones (Punto 10).
- *
- * E2 amplía este handler con los casos que falten:
- * tokens inválidos y exceso de solicitudes (429).
+ * Manejo centralizado de excepciones
  */
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -223,6 +220,29 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(response);
+    }
+
+    /*
+     * TODO E3: Editar excepción si es necesario.
+     * Rate limiting con Redis.
+     * Se maneja aparte de ApplicationException porque necesita
+     * escribir el encabezado Retry-After, que el handler generico
+     * no puede construir (no conoce retryAfterSeconds).
+     */
+    @ExceptionHandler(TooManyRequestsException.class)
+    public ResponseEntity<ErrorResponse> handleTooManyRequestsException(
+            TooManyRequestsException ex,
+            HttpServletRequest request) {
+        ErrorResponse response = new ErrorResponse(
+                ex.getStatus(),
+                ex.getCode(),
+                ex.getMessage(),
+                request.getRequestURI());
+
+        return ResponseEntity
+                .status(ex.getStatus())
+                .header("Retry-After", String.valueOf(ex.getRetryAfterSeconds()))
                 .body(response);
     }
 }
