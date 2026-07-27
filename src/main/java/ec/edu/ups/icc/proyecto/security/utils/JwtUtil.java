@@ -27,30 +27,21 @@ public class JwtUtil {
     public JwtUtil(JwtProperties jwtProperties) {
         this.jwtProperties = jwtProperties;
         this.signingKey = Keys.hmacShaKeyFor(
-                jwtProperties.getSecret().getBytes(StandardCharsets.UTF_8)
-        );
+                jwtProperties.getSecret().getBytes(StandardCharsets.UTF_8));
     }
-
-    /*
-     * ==========================
-     * GENERACIÓN DE TOKENS
-     * ==========================
-     */
 
     public String generateAccessToken(UserDetailsImpl userDetails) {
         return buildToken(
                 userDetails,
                 jwtProperties.getAccessExpiration(),
-                ACCESS
-        );
+                ACCESS);
     }
 
     public String generateRefreshToken(UserDetailsImpl userDetails) {
         return buildToken(
                 userDetails,
                 jwtProperties.getRefreshExpiration(),
-                REFRESH
-        );
+                REFRESH);
     }
 
     private String buildToken(
@@ -78,12 +69,6 @@ public class JwtUtil {
                 .compact();
     }
 
-    /*
-     * ==========================
-     * EXTRACCIÓN DE CLAIMS
-     * ==========================
-     */
-
     public Long getUserId(String token) {
         return Long.parseLong(getClaims(token).getSubject());
     }
@@ -95,12 +80,6 @@ public class JwtUtil {
     public String getTokenType(String token) {
         return getClaims(token).get(TOKEN_TYPE, String.class);
     }
-
-    /*
-     * ==========================
-     * VALIDACIONES
-     * ==========================
-     */
 
     public boolean validateToken(String token) {
         try {
@@ -120,12 +99,6 @@ public class JwtUtil {
         return validateToken(token)
                 && REFRESH.equals(getTokenType(token));
     }
-
-    /*
-     * ==========================
-     * MÉTODO PRIVADO
-     * ==========================
-     */
 
     private Claims getClaims(String token) {
 

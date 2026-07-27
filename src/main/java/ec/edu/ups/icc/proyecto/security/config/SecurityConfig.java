@@ -1,8 +1,8 @@
 package ec.edu.ups.icc.proyecto.security.config;
 
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -39,7 +39,7 @@ public class SecurityConfig {
     public SecurityConfig(UserDetailsServiceImpl userDetailsService,
             JwtAuthenticationEntryPoint authenticationEntryPoint,
             JwtAuthenticationFilter jwtAuthenticationFilter) {
-                
+
         this.userDetailsService = userDetailsService;
         this.authenticationEntryPoint = authenticationEntryPoint;
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
@@ -74,7 +74,7 @@ public class SecurityConfig {
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(authenticationEntryPoint))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                    // públicas
+                        // públicas
                         .requestMatchers("/auth/**").permitAll()
 
                         .requestMatchers("/actuator/health").permitAll()
@@ -84,9 +84,8 @@ public class SecurityConfig {
                                 "/v3/api-docs/**")
                         .permitAll()
 
-                        // TODO E2
-                        // aquí luego se añadirán los GET públicos
-                        // de eventos, categorías y sesiones
+                        // GET públicos de eventos, categorías y sesiones
+                        .requestMatchers(HttpMethod.GET, "/categories/**", "/events/**", "/sessions/**").permitAll()
 
                         .anyRequest().authenticated())
 
