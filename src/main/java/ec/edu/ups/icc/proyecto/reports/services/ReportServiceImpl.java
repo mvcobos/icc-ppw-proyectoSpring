@@ -1,5 +1,8 @@
 package ec.edu.ups.icc.proyecto.reports.services;
 
+import java.time.ZoneId;
+import ec.edu.ups.icc.proyecto.core.config.AppProperties;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.time.OffsetDateTime;
@@ -45,27 +48,31 @@ public class ReportServiceImpl implements ReportService {
      * Límites amplios usados cuando el filtro de fechas no viene.
      * La consulta no puede usar IS NULL con parámetros temporales.
      */
-    private static final OffsetDateTime MIN_DATE =
-            OffsetDateTime.of(1900, 1, 1, 0, 0, 0, 0, ZoneOffset.UTC);
+    private static final OffsetDateTime MIN_DATE = OffsetDateTime.of(1900, 1, 1, 0, 0, 0, 0, ZoneOffset.UTC);
 
-    private static final OffsetDateTime MAX_DATE =
-            OffsetDateTime.of(2999, 12, 31, 23, 59, 59, 0, ZoneOffset.UTC);
+    private static final OffsetDateTime MAX_DATE = OffsetDateTime.of(2999, 12, 31, 23, 59, 59, 0, ZoneOffset.UTC);
 
     // La conversión a America/Guayaquil corresponde al Punto 14.
+    // Los instantes se guardan en UTC y se muestran en la zona de negocio.
     private static final DateTimeFormatter DATE_FORMATTER =
             DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
-
     private static final String[] REGISTRATION_COLUMNS = {
             "Código", "Participante", "Correo", "Estado", "Fecha de inscripción"
     };
 
+    
     private final EventRepository eventRepository;
     private final RegistrationRepository registrationRepository;
 
+    // Zona de negocio en la que se muestran los instantes (Punto 14).
+    private final ZoneId businessZone;
+
     public ReportServiceImpl(EventRepository eventRepository,
-            RegistrationRepository registrationRepository) {
+            RegistrationRepository registrationRepository,
+            AppProperties appProperties) {
         this.eventRepository = eventRepository;
         this.registrationRepository = registrationRepository;
+        this.businessZone = ZoneId.of(appProperties.getTimezone());
     }
 
     // Listado de inscritos en PDF. Propietario o ADMIN.
@@ -368,4 +375,5 @@ public class ReportServiceImpl implements ReportService {
 
         return date.format(DATE_FORMATTER);
     }
+
 }
