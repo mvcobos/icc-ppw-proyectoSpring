@@ -35,3 +35,7 @@ jwt:
 
 cors:
   allowed-origins: ${ALLOWED_ORIGINS}
+
+swagger:
+  user: ${SWAGGER_USER}
+  password: ${SWAGGER_PASSWORD}

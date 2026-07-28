@@ -2,6 +2,7 @@ package ec.edu.ups.icc.proyecto.security.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -19,14 +20,6 @@ import ec.edu.ups.icc.proyecto.security.filters.JwtAuthenticationEntryPoint;
 import ec.edu.ups.icc.proyecto.security.filters.JwtAuthenticationFilter;
 import ec.edu.ups.icc.proyecto.security.services.UserDetailsServiceImpl;
 
-/*
- * TODO E2: configuración temporal de seguridad.
- *
- * E2 debe reemplazar permitAll() por:
- *   - rutas públicas: /auth/**, /actuator/health, documentación
- *   - resto autenticado con el filtro JWT
- *   - @PreAuthorize en los métodos marcados
- */
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity(prePostEnabled = true)
@@ -68,6 +61,7 @@ public class SecurityConfig {
     }
 
     @Bean
+    @Order(2)
     SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())

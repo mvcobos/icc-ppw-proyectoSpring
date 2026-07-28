@@ -16,10 +16,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-/*
- * CRUD administrativo de usuarios (Punto 3).
- * No asignado por la División original; queda a cargo de E2.
- */
 @Tag(
     name = "Usuarios",
     description = "Administración de usuarios y roles (uso exclusivo de ADMIN)"
