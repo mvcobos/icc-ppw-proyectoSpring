@@ -29,3 +29,23 @@ management:
 
 app:
   timezone: America/Guayaquil
+
+# Límites de la tabla del Punto 7. Fijos por enunciado, por eso
+# viven aquí y no en los perfiles dev/prod.
+rate-limit:
+  enabled: ${RATE_LIMIT_ENABLED:true}
+  login:
+    max-requests: 5
+    window-seconds: 60
+  register:
+    max-requests: 3
+    window-seconds: 3600
+  public-endpoints:
+    max-requests: 60
+    window-seconds: 60
+  authenticated:
+    max-requests: 120
+    window-seconds: 60
+  reports:
+    max-requests: 5
+    window-seconds: 60
