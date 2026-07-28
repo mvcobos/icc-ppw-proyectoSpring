@@ -9,7 +9,7 @@ version = "0.0.1-SNAPSHOT"
 
 java {
 	toolchain {
-		languageVersion = JavaLanguageVersion.of(21)
+		languageVersion = JavaLanguageVersion.of(22)
 	}
 }
 
@@ -29,8 +29,14 @@ dependencies {
 	developmentOnly("org.springframework.boot:spring-boot-devtools")
 	runtimeOnly("org.postgresql:postgresql")
 	// Documentación OpenAPI (Punto 11)
+	
 	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.3")
-
+	
+	// Reportes descargables: Excel con Apache POI, PDF con OpenPDF (Punto 13)
+	
+	implementation("org.apache.poi:poi-ooxml:5.5.1")
+	implementation("com.github.librepdf:openpdf:3.0.5")
+	
 	// JWT (Puntos 4 y 5)
 	implementation("io.jsonwebtoken:jjwt-api:0.12.6")
 	runtimeOnly("io.jsonwebtoken:jjwt-impl:0.12.6")
