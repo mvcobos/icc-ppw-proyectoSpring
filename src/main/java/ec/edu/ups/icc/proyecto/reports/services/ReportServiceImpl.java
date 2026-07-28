@@ -1,11 +1,9 @@
 package ec.edu.ups.icc.proyecto.reports.services;
 
-import java.time.ZoneId;
-import ec.edu.ups.icc.proyecto.core.config.AppProperties;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.time.OffsetDateTime;
+import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -20,6 +18,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import ec.edu.ups.icc.proyecto.core.config.AppProperties;
 import ec.edu.ups.icc.proyecto.core.exceptions.domain.BadRequestException;
 import ec.edu.ups.icc.proyecto.core.exceptions.domain.NotFoundException;
 import ec.edu.ups.icc.proyecto.events.entities.EventEntity;
@@ -48,19 +47,20 @@ public class ReportServiceImpl implements ReportService {
      * Límites amplios usados cuando el filtro de fechas no viene.
      * La consulta no puede usar IS NULL con parámetros temporales.
      */
-    private static final OffsetDateTime MIN_DATE = OffsetDateTime.of(1900, 1, 1, 0, 0, 0, 0, ZoneOffset.UTC);
+    private static final OffsetDateTime MIN_DATE =
+            OffsetDateTime.of(1900, 1, 1, 0, 0, 0, 0, ZoneOffset.UTC);
 
-    private static final OffsetDateTime MAX_DATE = OffsetDateTime.of(2999, 12, 31, 23, 59, 59, 0, ZoneOffset.UTC);
+    private static final OffsetDateTime MAX_DATE =
+            OffsetDateTime.of(2999, 12, 31, 23, 59, 59, 0, ZoneOffset.UTC);
 
-    // La conversión a America/Guayaquil corresponde al Punto 14.
     // Los instantes se guardan en UTC y se muestran en la zona de negocio.
     private static final DateTimeFormatter DATE_FORMATTER =
             DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+
     private static final String[] REGISTRATION_COLUMNS = {
             "Código", "Participante", "Correo", "Estado", "Fecha de inscripción"
     };
 
-    
     private final EventRepository eventRepository;
     private final RegistrationRepository registrationRepository;
 
@@ -373,7 +373,6 @@ public class ReportServiceImpl implements ReportService {
             return "";
         }
 
-        return date.format(DATE_FORMATTER);
+        return date.atZoneSameInstant(businessZone).format(DATE_FORMATTER);
     }
-
 }
