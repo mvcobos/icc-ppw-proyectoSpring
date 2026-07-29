@@ -1,5 +1,8 @@
 package ec.edu.ups.icc.proyecto.security.services;
 
+import ec.edu.ups.icc.proyecto.ratelimit.services.RateLimitService;
+import ec.edu.ups.icc.proyecto.ratelimit.services.LoginAttemptService;
+
 import ec.edu.ups.icc.proyecto.auditlogs.services.AuditLogService;
 import ec.edu.ups.icc.proyecto.core.exceptions.domain.ConflictException;
 import ec.edu.ups.icc.proyecto.core.exceptions.domain.NotFoundException;
@@ -40,6 +43,8 @@ public class AuthServiceImpl implements AuthService {
     private final RefreshTokenService refreshTokenService;
     private final AuditLogService auditLogService;
     private final UserMapper userMapper;
+    private final RateLimitService rateLimitService;
+    private final LoginAttemptService loginAttemptService;
 
     // Constructor lleno
     public AuthServiceImpl(UserRepository userRepository,
@@ -50,7 +55,9 @@ public class AuthServiceImpl implements AuthService {
             JwtProperties jwtProperties,
             RefreshTokenService refreshTokenService,
             AuditLogService auditLogService,
-            UserMapper userMapper) {
+            UserMapper userMapper,
+            RateLimitService rateLimitService,
+            LoginAttemptService loginAttemptService) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
@@ -60,11 +67,14 @@ public class AuthServiceImpl implements AuthService {
         this.refreshTokenService = refreshTokenService;
         this.auditLogService = auditLogService;
         this.userMapper = userMapper;
+        this.rateLimitService = rateLimitService;
+        this.loginAttemptService = loginAttemptService;
     }
 
     @Override
     @Transactional
     public AuthResponseDto register(RegisterRequestDto dto, String clientIp) {
+        rateLimitService.checkRegister(clientIp);
         String normalizedEmail = dto.getEmail().toLowerCase();
 
         if (userRepository.findByEmail(normalizedEmail).isPresent()) {
@@ -98,13 +108,23 @@ public class AuthServiceImpl implements AuthService {
     @Override
     @Transactional
     public AuthResponseDto login(LoginRequestDto dto, String clientIp) {
+        rateLimitService.checkLogin(clientIp, dto.getEmail());
+        loginAttemptService.checkBlocked(dto.getEmail());
         String normalizedEmail = dto.getEmail().toLowerCase();
 
         try {
-            Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(normalizedEmail, dto.getPassword()));
+            Authentication authentication;
+            try {
+                authentication = authenticationManager.authenticate(
+                        new UsernamePasswordAuthenticationToken(normalizedEmail, dto.getPassword()));
+            } catch (org.springframework.security.core.AuthenticationException ex) {
+                loginAttemptService.registerFailure(dto.getEmail());
+                throw ex;
+            }
 
             UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+
+            loginAttemptService.clearFailures(dto.getEmail());
 
             String accessToken = jwtUtil.generateAccessToken(userDetails);
             String refreshToken = refreshTokenService.issueRefreshToken(userDetails, clientIp);
