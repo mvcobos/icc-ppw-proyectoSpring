@@ -5,6 +5,12 @@ build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 
+### Despliegue (Punto 15/16) ###
+.env
+*.pdf
+*.xlsx
+~$*
+
 ### STS ###
 .apt_generated
 .classpath

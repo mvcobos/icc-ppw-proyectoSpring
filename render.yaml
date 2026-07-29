@@ -1,0 +1,76 @@
+databases:
+  - name: proyecto-postgres
+    databaseName: academic_events_db
+    plan: free
+    region: oregon
+
+services:
+  # Key Value: el servicio de Redis de Render (Valkey 8, compatible).
+  # ipAllowList vacío = solo accesible desde la red interna.
+  - type: keyvalue
+    name: proyecto-redis
+    plan: free
+    region: oregon
+    ipAllowList: []
+
+  - type: web
+    name: proyecto-api
+    runtime: docker
+    plan: free
+    region: oregon
+    branch: main
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /api/actuator/health
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+
+      # Sin límite de heap la JVM agota los 512 MB del plan free
+      # y Render mata el contenedor (Punto 15).
+      - key: JAVA_TOOL_OPTIONS
+        value: -Xmx300m -XX:MaxMetaspaceSize=128m
+
+      # Credenciales inyectadas por Render desde la base de datos.
+      - key: DB_USERNAME
+        fromDatabase:
+          name: proyecto-postgres
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: proyecto-postgres
+          property: password
+
+      # Se llena a mano: Render entrega postgresql:// y JPA necesita jdbc:
+      - key: DB_URL
+        sync: false
+
+      - key: REDIS_URL
+        fromService:
+          name: proyecto-redis
+          type: keyvalue
+          property: connectionString
+
+      # Manual: HS384 exige clave >= 384 bits y generateValue no lo garantiza.
+      - key: JWT_SECRET
+        sync: false
+      - key: JWT_ACCESS_EXPIRATION
+        value: 900000
+      - key: JWT_REFRESH_EXPIRATION
+        value: 604800000
+      - key: JWT_ISSUER
+        value: proyecto-api
+
+      # Sin "*" en producción (Punto 8).
+      - key: ALLOWED_ORIGINS
+        sync: false
+
+      # Sin estas dos la aplicación no arranca en perfil prod.
+      - key: SWAGGER_USER
+        sync: false
+      - key: SWAGGER_PASSWORD
+        sync: false
+
+      - key: JPA_SHOW_SQL
+        value: false
+      - key: JPA_DDL_AUTO
+        value: validate

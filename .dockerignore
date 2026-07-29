@@ -1,0 +1,10 @@
+build/
+.gradle/
+.git/
+.vscode/
+.idea/
+*.pdf
+*.xlsx
+~$*
+.env
+log.txt
