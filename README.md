@@ -47,11 +47,7 @@ Insertados automáticamente desde la migración inicial (`V1__initial_schema_and
 | **Participante** | `carlos.velez@academic.test` | `Password123*` |
 
 
-## 4.- Colección de Postman:
-
-
-
-## 5.- Variables de Entorno Requeridas:
+## 4.- Variables de Entorno Requeridas:
 
 Consulta el archivo `.env.example` en la raíz del proyecto para el listado completo.
 
@@ -70,7 +66,7 @@ Consulta el archivo `.env.example` en la raíz del proyecto para el listado comp
 | `SWAGGER_PASSWORD` | Contraseña de acceso a Swagger UI en perfil `prod`. | Seguridad Basic Auth |
 
 
-## 6.- Ejecución en Entorno Local
+## 5.- Ejecución en Entorno Local
 
 ### Requisitos previos
 * Java 22 LTS
@@ -122,13 +118,17 @@ docker run --rm -p 8080:8080 `
   proyecto-api
 ```
 
-## 7.- Tests y verificaciones
+## 6.- Tests y verificaciones
 
 ### 1. Pruebas Unitarias (`/test`)
 
 ```bash 
 .\gradlew.bat test
 ```
+
+Lo que debería salir:
+
+![BUILD SUCCESSFUL en el terminal](./assets/ejecucion-tests.png)
 
 ### 2. Cliente de Prueba - Postman
 
