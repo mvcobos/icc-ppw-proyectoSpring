@@ -138,3 +138,31 @@ academic-events-api.postman_collection.json
 ```
 
 Incluye variables de entorno preconfiguradas para alternar fácilmente entre los entornos Local y Render.
+
+
+### 3. Evidencias de Swagger
+
+- Inicio de Sesión Exitoso:
+
+![Inicio de Sesión Exitoso](./assets/evidencias/post-login.png)
+
+- Renovación de Access Token:
+
+![Renovación de Access Token](./assets/evidencias/post-refresh.png)
+
+- Logout exitoso:
+
+![Logout exitoso](./assets/evidencias/post-logout.png)
+
+- Consumir EndPoint `GET /api/events/3`:
+
+![Consumir evento por id](./assets/evidencias/get-eventos.png)
+
+- Consumir EndPoint no existente `GET /api/events/999`:
+
+![Consumir evento por id y da error](./assets/evidencias/get-eventos-error.png)
+
+- Consumir EndPoint `GET /api/auth/me`:
+
+![Consumir /me](./assets/evidencias/get-me.png)
+
