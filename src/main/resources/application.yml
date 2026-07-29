@@ -49,3 +49,8 @@ rate-limit:
   reports:
     max-requests: 5
     window-seconds: 60
+
+# Bloqueo temporal por intentos fallidos (Punto 6)
+login-block:
+  max-failures: 5
+  block-seconds: 900
