@@ -54,13 +54,29 @@ es un secreto real.
 
 ### URLs públicas
 
-- API: `<pendiente>`
-- Swagger: `<pendiente>/api/swagger-ui.html`
-- Actuator Health: `<pendiente>/api/actuator/health`
+- API: https://proyecto-api-2jua.onrender.com/api
+- Swagger: https://proyecto-api-2jua.onrender.com/api/swagger-ui/index.html
+- Actuator Health: https://proyecto-api-2jua.onrender.com/api/actuator/health
 
-> El plan gratuito de Render duerme el servicio tras 15 minutos de
+Credenciales de Swagger: usuario `evaluador`, contraseña (entregada por
+separado).
+
+> El plan gratuito de Render suspende el servicio tras 15 minutos de
 > inactividad. La primera petición tras despertarlo puede tardar hasta
-> un minuto en responder.
+> un minuto en responder. Se recomienda abrir primero la URL de health
+> para "despertar" el servicio antes de probar el resto.
+
+> La base de datos gratuita de Render expira 30 días después de su
+> creación (creada el 28 de julio de 2026).
+
+### Credenciales de prueba (datos semilla)
+
+No son secretos: vienen de la migración `V1__initial_schema_and_data.sql`.
+
+| Rol | Email | Contraseña |
+|---|---|---|
+| Organizador | `maria.cordero@academic.test` | `Password123*` |
+| Participante | `carlos.velez@academic.test` | `Password123*` |
 
 ### Verificación post-despliegue
 

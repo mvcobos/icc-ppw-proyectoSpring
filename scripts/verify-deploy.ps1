@@ -6,8 +6,7 @@ Uso:
 #>
 
 param(
-    [Parameter(Mandatory = $true)]
-    [string]$BaseUrl
+    [string]$BaseUrl = "https://proyecto-api-2jua.onrender.com/api"
 )
 
 $ErrorActionPreference = 'Stop'
