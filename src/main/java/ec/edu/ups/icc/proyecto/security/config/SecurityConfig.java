@@ -60,7 +60,7 @@ public class SecurityConfig {
 
         return configuration.getAuthenticationManager();
     }
-
+ 
     @Bean
     @Order(2)
     SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
