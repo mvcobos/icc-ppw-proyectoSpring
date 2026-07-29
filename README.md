@@ -1,35 +1,109 @@
-# icc-ppw-proyectoSpring
+# Proyecto Final PPW 
 
-## Despliegue (Punto 15 y 16)
+API REST desarrollada con **Spring Boot 3 / 4**, **PostgreSQL**, **Redis** y **Spring Security con JWT**, orientada a la gestión integral de eventos académicos, inscripciones, control de roles y auditoría.
 
-Backend desplegado como contenedor Docker en Render, con PostgreSQL y
-Redis/Key Value como servicios separados (ver `render.yaml`).
+## Estudiantes:
 
-### Variables de entorno requeridas
+- María Verónica Cobos Arévalo
+- Dayanna Carolina Fortmann Sánchez
+- Jonnathan Josué Párraga Riera
 
-Ninguna de las filas siguientes lleva un valor real: son solo nombre,
-para qué sirve y de dónde sale en Render. Ver `.env.example` para el
-listado completo con valores de ejemplo (no reales). Nunca subir un
-`.env` con credenciales reales al repositorio.
 
-| Variable | Para qué sirve | Origen en Render |
+## 1.- Enlaces Públicos:
+
+- **Backend API Base:** `https://proyecto-api-2jua.onrender.com/api`
+- **Swagger UI (Documentación interactiva):** `https://proyecto-api-2jua.onrender.com/api/swagger-ui/index.html`
+
+Credenciales de Swagger: usuario `evaluador`, contraseña (entregada por separado).
+
+- **Actuator Health Check:** `https://proyecto-api-2jua.onrender.com/api/actuator/health`
+
+- **Link a YouTube:**
+
+
+## 2.- Arquitectura y Seguridad:
+
+* **Autenticación:** Basada en **Stateless JWT** (Access Token de corta duración) y **Refresh Tokens** persistidos y revocables en base de datos.
+* **Control de Acceso:** Basado en Roles (`ROLE_USER`, `ROLE_ORGANIZER`, `ROLE_ADMIN`) y validación de propiedad (*ownership*) para recursos creados por organizadores.
+* **Protección Swagger en Producción:** La interfaz de Swagger UI está resguardada bajo **HTTP Basic Authentication** para evitar la exposición pública de la documentación.
+* **Auditoría:** Registro asíncrono y desacoplado de operaciones (`SUCCESS` / `FAILED`) capturando IP origen, método HTTP, URI y `X-Correlation-Id`.
+
+## 3.- Modelo de Base de Datos y Migraciones:
+
+El proyecto utiliza **Flyway** para la gestión del esquema de la base de datos y la inserción de datos iniciales.
+
+### Diagrama Entidad-Relación:
+
+![Diagrama Entidad Relación](./assets/diagrama-bd.png)
+
+### Credenciales de Prueba:
+
+Insertados automáticamente desde la migración inicial (`V1__initial_schema_and_data.sql`):
+
+| Rol | Email | Contraseña |
 |---|---|---|
-| `PORT` | puerto en el que escucha el servidor embebido | automática |
-| `DB_URL` | cadena de conexión JDBC a PostgreSQL | manual (`sync: false`); Render entrega `postgresql://...`, hay que reescribirla como `jdbc:postgresql://host/db` |
-| `DB_USERNAME` | usuario de la base de datos | inyectada desde el recurso de base de datos |
-| `DB_PASSWORD` | contraseña de la base de datos | inyectada desde el recurso de base de datos |
-| `REDIS_URL` | cadena de conexión a Redis/Key Value (rate limiting y bloqueo de login) | inyectada desde el servicio Key Value |
-| `JWT_SECRET` | clave de firma HS384 de los tokens (mínimo 384 bits) | manual (`sync: false`); `generateValue` no garantiza la longitud mínima |
-| `JWT_ACCESS_EXPIRATION` | vigencia del access token en ms | valor fijo |
-| `JWT_REFRESH_EXPIRATION` | vigencia del refresh token en ms | valor fijo |
-| `ALLOWED_ORIGINS` | orígenes permitidos por CORS | manual, dominios del frontend en prod |
-| `SWAGGER_USER` | usuario para acceder a Swagger UI en prod | manual |
-| `SWAGGER_PASSWORD` | contraseña para acceder a Swagger UI en prod | manual |
-| `JAVA_TOOL_OPTIONS` | límites de heap/metaspace de la JVM | recomendada, necesaria en el plan free (512 MB) |
+| **Administrador** | `admin@academic.test` | `Admin123*` |
+| **Organizador** | `maria.cordero@academic.test` | `Password123*` |
+| **Participante** | `carlos.velez@academic.test` | `Password123*` |
 
-### Construir y correr con Docker en local
 
-```powershell
+## 4.- Colección de Postman:
+
+
+
+## 5.- Variables de Entorno Requeridas:
+
+Consulta el archivo `.env.example` en la raíz del proyecto para el listado completo.
+
+| Variable | Descripción | Origen / Ámbito |
+|---|---|---|
+| `PORT` | Puerto de escucha del servidor embebido. | Automático / Local (8080) |
+| `DB_URL` | Cadena JDBC de PostgreSQL (`jdbc:postgresql://host:port/db`). | Manual / Render |
+| `DB_USERNAME` | Usuario de la base de datos. | Variable de entorno |
+| `DB_PASSWORD` | Contraseña de la base de datos. | Variable de entorno |
+| `REDIS_URL` | Cadena de conexión a Redis (Rate Limiting y Login Lockout). | Key Value Store |
+| `JWT_SECRET` | Clave secreta para la firma HS384 (Mínimo 384 bits / 48 caracteres). | Variable de entorno |
+| `JWT_ACCESS_EXPIRATION` | Expiración del Access Token en milisegundos (ej: `900000`). | Fijo |
+| `JWT_REFRESH_EXPIRATION` | Expiración del Refresh Token en ms (ej: `604800000`). | Fijo |
+| `ALLOWED_ORIGINS` | Dominios habilitados para CORS. | Configuración web |
+| `SWAGGER_USER` | Usuario de acceso a Swagger UI en perfil `prod`. | Seguridad Basic Auth |
+| `SWAGGER_PASSWORD` | Contraseña de acceso a Swagger UI en perfil `prod`. | Seguridad Basic Auth |
+
+
+## 6.- Ejecución en Entorno Local
+
+### Requisitos previos
+* Java 22 LTS
+* Docker & Docker Compose
+
+### 1. Clonar el repositorio y configurar variables
+```bash
+git clone [https://github.com/tu-usuario/tu-repositorio.git](https://github.com/tu-usuario/tu-repositorio.git)
+cd tu-repositorio
+cp .env.example .env
+```
+
+### 2. Levantar la infraestructura (PostgreSQL & Redis)
+
+```bash 
+docker compose up -d
+```
+
+### 3. Ejecutar la aplicación con Gradle
+
+```bash 
+# En Windows (PowerShell)
+.\gradlew.bat bootRun
+
+# En Linux / macOS
+./gradlew bootRun
+```
+
+Con esto la API estará lista en `http://localhost:8080/api`
+
+### 4. Construir y Ejecutar con Docker
+
+```bash 
 docker build -t proyecto-api .
 
 docker run --rm -p 8080:8080 `
@@ -39,7 +113,7 @@ docker run --rm -p 8080:8080 `
   -e DB_USERNAME=ups `
   -e DB_PASSWORD=ups123 `
   -e REDIS_URL="redis://host.docker.internal:6379" `
-  -e JWT_SECRET="<clave-local-de-prueba>" `
+  -e JWT_SECRET="<clave-local-de-prueba-de-al-menos-48-caracteres>" `
   -e JWT_ACCESS_EXPIRATION=900000 `
   -e JWT_REFRESH_EXPIRATION=604800000 `
   -e ALLOWED_ORIGINS="http://localhost:5173" `
@@ -48,46 +122,19 @@ docker run --rm -p 8080:8080 `
   proyecto-api
 ```
 
-`host.docker.internal` apunta a Postgres/Redis levantados con
-`docker compose` en el host. Ninguno de los valores de ejemplo de arriba
-es un secreto real.
+## 7.- Tests y verificaciones
 
-### URLs públicas
+### 1. Pruebas Unitarias (`/test`)
 
-- API: https://proyecto-api-2jua.onrender.com/api
-- Swagger: https://proyecto-api-2jua.onrender.com/api/swagger-ui/index.html
-- Actuator Health: https://proyecto-api-2jua.onrender.com/api/actuator/health
-
-Credenciales de Swagger: usuario `evaluador`, contraseña (entregada por
-separado).
-
-> El plan gratuito de Render suspende el servicio tras 15 minutos de
-> inactividad. La primera petición tras despertarlo puede tardar hasta
-> un minuto en responder. Se recomienda abrir primero la URL de health
-> para "despertar" el servicio antes de probar el resto.
-
-> La base de datos gratuita de Render expira 30 días después de su
-> creación (creada el 28 de julio de 2026).
-
-### Credenciales de prueba (datos semilla)
-
-No son secretos: vienen de la migración `V1__initial_schema_and_data.sql`.
-
-| Rol | Email | Contraseña |
-|---|---|---|
-| Organizador | `maria.cordero@academic.test` | `Password123*` |
-| Participante | `carlos.velez@academic.test` | `Password123*` |
-
-### Verificación post-despliegue
-
-Una vez que la API tenga URL pública, ejecutar:
-
-```powershell
-.\scripts\verify-deploy.ps1 -BaseUrl "https://<tu-app>.onrender.com/api"
+```bash 
+.\gradlew.bat test
 ```
 
-Recorre health check, login, lectura de un evento, descarga de reporte
-PDF (propio y ajeno), bloqueo por intentos fallidos de login y CORS
-contra un origen no autorizado, e imprime un resumen de qué pasó y qué
-falló. El primer request puede tardar hasta 90 segundos por el arranque
-en frío del plan free; el script ya lo contempla.
+### 2. Cliente de Prueba - Postman
+
+Dentro de `/postman` del repositorio encontrarás el archivo de colección listo para importar:
+```bash 
+academic-events-api.postman_collection.json
+```
+
+Incluye variables de entorno preconfiguradas para alternar fácilmente entre los entornos Local y Render.
