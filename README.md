@@ -69,7 +69,7 @@ Consulta el archivo `.env.example` en la raíz del proyecto para el listado comp
 ## 5.- Ejecución en Entorno Local
 
 ### Requisitos previos
-* Java 22 LTS
+* Java 21
 * Docker & Docker Compose
 
 ### 1. Clonar el repositorio y configurar variables
