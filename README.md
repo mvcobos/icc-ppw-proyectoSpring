@@ -14,7 +14,7 @@ API REST desarrollada con **Spring Boot 3 / 4**, **PostgreSQL**, **Redis** y **S
 - **Backend API Base:** `https://proyecto-api-2jua.onrender.com/api`
 - **Swagger UI (Documentación interactiva):** `https://proyecto-api-2jua.onrender.com/api/swagger-ui/index.html`
 
-Credenciales de Swagger: usuario `evaluador`, contraseña (entregada por separado).
+Credenciales de Swagger: usuario `evaluador`, contraseña entregada por separado.
 
 - **Actuator Health Check:** `https://proyecto-api-2jua.onrender.com/api/actuator/health`
 
@@ -42,7 +42,7 @@ Insertados automáticamente desde la migración inicial (`V1__initial_schema_and
 
 | Rol | Email | Contraseña |
 |---|---|---|
-| **Administrador** | `admin@academic.test` | `Admin123*` |
+| **Administrador** | `admin@academic.test` | `Password123*` |
 | **Organizador** | `maria.cordero@academic.test` | `Password123*` |
 | **Participante** | `carlos.velez@academic.test` | `Password123*` |
 
@@ -166,3 +166,11 @@ Incluye variables de entorno preconfiguradas para alternar fácilmente entre los
 
 ![Consumir /me](./assets/evidencias/get-me.png)
 
+
+## 7.- Conclusión
+
+Este proyecto nos ayudó a construir una API REST completa para la gestión de eventos académicos, aplicando en un mismo sistema los conceptos centrales de un backend moderno: arquitectura modular, persistencia relacional con reglas de negocio defendidas en dos capas, seguridad basada en JWT con autorización por rol y por propiedad del recurso, control de tráfico distribuido con Redis, generación de reportes bajo demanda y despliegue en producción con contenedores independientes.
+
+Además, dejó aprendizajes concretos sobre decisiones que en un curso solemos dar por sentadas y que aquí tuvimos que justificar: por qué el esquema de base de datos manda sobre Hibernate y no al revés, por qué un refresh token se guarda hasheado y nunca en texto plano, por qué la propiedad de un recurso necesita validarse en el servicio y no alcanza con el rol verificado en el controller, y por qué Redis debe usarse solo para datos efímeros y nunca como almacenamiento principal.
+
+El resultado es una API que compila, se despliega, responde con errores uniformes y predecibles, y que defiende sus reglas de negocio incluso cuando el cliente hace algo que no debería, devolviendo siempre una respuesta clara en vez de un error genérico.
